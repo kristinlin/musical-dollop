@@ -11,28 +11,36 @@
   ====================*/
 struct matrix * make_bezier() {
   struct matrix * bezier = new_matrix(4, 4);
+  bezier->lastcol = 4;
   int r, c;
   for (r = 0; r < 4; r++) {
     for (c = 0; c < 4; c++) {
       if (r == 0 && c == 0) {
 	bezier->m[r][c] = -1;
       }
-      else if ( (r == 0 && (c == 1 || c == 2)) ||
-		((r == 1 && c == 0) || (r == 2 && c == 1))) {
+      else if ( (r == 0 && c == 1) ||
+		(r == 1 && c == 0) ||
+		(r == 1 && c == 2) ||
+		(r == 2 && c == 1) ) {
 	bezier->m[r][c] = 3;
       }
-      else if ( (r == 0 || r == 2) &&
-		(c == 0 || c == 2) ) {
+      else if ( (r == 0 && c == 2) ||
+		(r == 2  && c == 0) ) {
 	bezier->m[r][c] = -3;
       }
       else if ( r == 1 && c == 1 ) {
 	bezier->m[r][c] = -6;
+      }
+      else if ( (r == 0 && c == 3) ||
+		(r == 3 && c == 0)) {
+	bezier->m[r][c] = 1;
       }
       else {
 	bezier->m[r][c] = 0;
       }
     }
   }
+  //  print_matrix(bezier);
   return bezier;
 }
 
@@ -45,6 +53,7 @@ struct matrix * make_bezier() {
   ====================*/
 struct matrix * make_hermite() {
   struct matrix * hermite = new_matrix(4, 4);
+  hermite->lastcol = 4;
   int r, c;
   for (r = 0; r < 4; r++) {
     for (c = 0; c < 4; c++) {
@@ -64,13 +73,18 @@ struct matrix * make_hermite() {
 	hermite->m[r][c] = -3;
       }
       else if (r == 1 && c == 1) {
-	hermite->m[r][c] = -3;
+	hermite->m[r][c] = 3;
       }
+      else if (r == 1 && c == 3) {
+	hermite->m[r][c] = -1;
+      }
+
       else {
-	hermite-m[r][c] = 0;
+	hermite->m[r][c] = 0;
       }
     }
   }
+  //  print_matrix(hermite);
   return hermite;
 }
 
@@ -90,21 +104,27 @@ struct matrix * make_hermite() {
   ====================*/
 struct matrix * generate_curve_coefs( double p1, double p2, 
 				      double p3, double p4, int type) {
-  struct matrix * givens = new_matrix(1, 4);
-  givens->m[0][1] = p1;
-  givens->m[0][2] = p2;
-  givens->m[0][3] = p3;
-  givens->m[0][4] = p4;
+  //given values
+  struct matrix * givens = new_matrix(4, 1);
+  givens->lastcol = 1;
+  givens->m[0][0] = p1;
+  givens->m[1][0] = p2;
+  givens->m[2][0] = p3;
+  givens->m[3][0] = p4;
+
+  //individual hermite/bezier matrices
   struct matrix * mult;
   if (type == HERMITE) {
     mult = make_hermite();
   } else {
     mult = make_bezier();
   }
-  struct matrix * ret = matrix_mult( mult, givens );
-  free(givens);
+
+  //multiply
+  matrix_mult( mult, givens );
+
   free(mult);
-  return ret;
+  return givens;
 }
 
 

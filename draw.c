@@ -19,6 +19,19 @@
 void add_circle( struct matrix * points,
                  double cx, double cy, double cz,
                  double r, double step ) {
+  double t;
+  double x0 = cx + r;
+  double y0 = cy;
+  double x1, y1;
+  for (t = 0; t < 2* (M_PI * 2 + step); t += 2*step) {
+    x1 = r * cos(t) + cx;
+    y1 = r * sin(t) + cy;
+    add_edge( points,
+	      x0, y0, 0,
+	      x1, y1, 0);
+    x0 = x1;
+    y0 = y1;
+  }
 }
 
 /*======== void add_curve() ==========
@@ -45,6 +58,35 @@ void add_curve( struct matrix *points,
                 double x2, double y2, 
                 double x3, double y3, 
                 double step, int type ) {
+
+  //calculate coefs for both x and y functions
+  //xa, xb, xc, xd, ya, yb, yc, yd;
+  struct matrix * xcoef = generate_curve_coefs(x0, x1, x2, x3, type);
+  struct matrix * ycoef = generate_curve_coefs(y0, y1, y2, y3, type);
+  
+  //  print_matrix(xcoef);
+  //  print_matrix(ycoef);
+
+  //loop through t; calculate x and y values and add edges
+  double t;
+  for (t = 0; t < 1+step; t += step) {
+    x1 = xcoef->m[0][0]*pow(t, 3) +
+      xcoef->m[1][0]*pow(t, 2) +
+      xcoef->m[2][0]*t +
+      xcoef->m[3][0];
+    y1 = ycoef->m[0][0]*pow(t, 3) +
+      ycoef->m[1][0]*pow(t, 2) +
+      ycoef->m[2][0]*t +
+      ycoef->m[3][0];
+    add_edge( points,
+	      x0, y0, 0,
+	      x1, y1, 0 );
+    x0 = x1;
+    y0 = y1;
+  }
+
+  free(xcoef);
+  free(ycoef);
 }
 
 

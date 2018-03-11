@@ -8,6 +8,7 @@ as the maximum color value you want to use.
 Creates the point structure in order to represent 
 a pixel as a color triple
 =========================*/
+#include <math.h>
 #ifndef ML6_H
 #define ML6_H
 

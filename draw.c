@@ -23,7 +23,7 @@ void add_circle( struct matrix * points,
   double x0 = cx + r;
   double y0 = cy;
   double x1, y1;
-  for (t = 0; t < 2* (M_PI * 2 + step); t += 2*step) {
+  for (t = 0; t < M_PI * 2 + step; t += step) {
     x1 = r * cos(t) + cx;
     y1 = r * sin(t) + cy;
     add_edge( points,
